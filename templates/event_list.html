@@ -1,0 +1,98 @@
+{%include 'nav.html'%}
+{%load static%}
+{%block content%}
+{% for event in events %}
+
+<div class="container h-100 d-flex justify-content-center">
+<div class="jumbotron my-auto">
+
+<div class="card" style="width: 18rem;">
+  {%if event.image%}
+  <img class="card-img-top" src="{{ event.image.url }}" alt="Card image cap">
+  {%else%}
+  <img class="card-img-top"  alt="Card image cap">
+  {%endif%}
+  <div class="card-body">
+    <h5 class="card-title">{{event.event_name}}</h5>
+    <p class="card-text">{{event.data}}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">{{event.location}}</li>
+    <li class="list-group-item">{{event.timestamp}}</li>
+  </ul>
+  <div class="card-body">
+    <form action = "{%url 'like_post'%}" method = "post" class = "like-form" id= "{{event.id}}">
+      {% csrf_token %}
+      <input type="hidden" name="post_id" value={{event.id}}>
+        <button type="submit" class="ui button like-btn{{event.id}}">
+           {% if user not in event.is_liked.all %}
+               Like
+           {% else %}
+               Unlike
+           {% endif %}
+        </button>
+        <div class="ui grid">
+        <div class="column">
+            <div class="like-count{{event.id}}"> {{event.is_liked.count}} </div>
+        </div>
+        <div class="column">
+            likes
+        </div>
+        </div>
+    </form>
+  </div>
+</div>
+<br/>
+<hr>
+<br/>
+</div>
+</div>
+{%endfor%}
+{%endblock content%}
+
+{% block scripts %}
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $( document ).ready(function() {
+
+            $('.like-form').submit(function(e){
+                e.preventDefault()
+
+                const post_id = $(this).attr('id')
+                const likeText = $(`.like-btn${post_id}`).text()
+                const trim = $.trim(likeText)
+
+                const url = $(this).attr('action')
+
+                let res;
+                const likes = $(`.like-count${post_id}`).text()
+                const trimCount = parseInt(likes)
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {
+                        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+                        'post_id':post_id,
+                    },
+                    success: function(response) {
+                        if(trim === 'Unlike') {
+                            $(`.like-btn${post_id}`).text('Like')
+                            res = trimCount - 1
+                            console.log(res)
+                        } else {
+                            $(`.like-btn${post_id}`).text('Unlike')
+                            res = trimCount + 1
+                        }
+
+                        $(`.like-count${post_id}`).text(res)
+                    },
+                    error: function(response) {
+                        console.log('error', response)
+                    }
+                })
+
+            })
+        });
+    </script>
+{% endblock scripts %}

@@ -1,0 +1,12 @@
+<form class="text-center border border-light p-5" method="POST" action=""enctype="multipart/form-data">
+{% csrf_token %}
+
+    <!-- Name -->
+    <input type="text" id="defaultContactFormName" class="form-control mb-4"name="event_name" placeholder="Event Name">
+    <input type="text" id="defaultContactFormName" class="form-control mb-4"name="location" placeholder="Location">
+    <textarea class="form-control mb-4" name="data"id="exampleFormControlTextarea5" rows="3"placeholder="Product Description"></textarea>
+    <input type="file" id="defaultContactFormName" class="form-control mb-4"name="image">
+    <!-- Send button -->
+    <button class="btn btn-info btn-block" type="submit">Save</button>
+
+</form>
